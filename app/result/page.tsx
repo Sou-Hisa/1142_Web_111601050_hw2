@@ -2,13 +2,28 @@
 import { useState, useEffect } from "react";
 import { usePsyStore } from "@/store/store";
 import { useRouter } from "next/navigation"
+import html2canvas from "html2canvas";
+import { useRef } from "react";
 
 export default function Result() {
   const router = useRouter();
   const psyData = usePsyStore( (state)=> state.psyData );
   const setPsyScore = usePsyStore( (state) => state.setScore );
   const [psyResult, setPsyResult] = useState(<></>);
-  
+  const resultRef = useRef<HTMLDivElement>(null);
+
+async function saveResult() {
+  if (!resultRef.current) return;
+
+  const canvas = await html2canvas(resultRef.current);
+  const image = canvas.toDataURL("image/png");
+
+  const link = document.createElement("a");
+  link.href = image;
+  link.download = "心理測驗結果.png";
+  link.click();
+}
+
   useEffect( ()=>{
     getResult();
   }, [psyData.score]);
@@ -55,7 +70,10 @@ export default function Result() {
   
   return (
     <main className="min-h-screen flex items-center justify-center bg-pink-50 px-6">
-      <div className="max-w-xl rounded-3xl bg-white p-10 text-center shadow">
+      <div
+        ref={resultRef}
+        className="max-w-xl rounded-3xl bg-white p-10 text-center shadow"
+      >
         <p className="mb-4 text-gray-500">
           你的分數：{psyData.score}
         </p>
@@ -64,14 +82,22 @@ export default function Result() {
           {psyResult}
         </div>
   
-        <button
-          className="rounded-full bg-pink-600 px-8 py-3 text-white font-bold hover:bg-pink-700"
-          onClick={playAgain}
-        >
-          再玩一次
-        </button>
+        <div className="flex justify-center gap-4">
+          <button
+            className="rounded-full bg-pink-600 px-8 py-3 text-white font-bold hover:bg-pink-700"
+            onClick={playAgain}
+          >
+            再玩一次
+          </button>
+  
+          <button
+            className="rounded-full border border-pink-600 px-8 py-3 text-pink-600 font-bold hover:bg-pink-50"
+            onClick={saveResult}
+          >
+            保存結果
+          </button>
+        </div>
       </div>
     </main>
   );
-
 }

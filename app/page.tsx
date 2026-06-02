@@ -14,10 +14,10 @@ export default function Home() {
       </p>
 
       <Link
-        href="/question"
+        href="/intro"
         className="rounded-full bg-pink-600 px-8 py-3 text-white font-bold hover:bg-pink-700"
       >
-        開始測驗
+        開始
       </Link>
     </main>
   );
