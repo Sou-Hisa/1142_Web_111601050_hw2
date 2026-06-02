@@ -12,17 +12,30 @@ export default function Result() {
   const [psyResult, setPsyResult] = useState(<></>);
   const resultRef = useRef<HTMLDivElement>(null);
 
-async function saveResult() {
-  if (!resultRef.current) return;
-
-  const canvas = await html2canvas(resultRef.current);
-  const image = canvas.toDataURL("image/png");
-
-  const link = document.createElement("a");
-  link.href = image;
-  link.download = "心理測驗結果.png";
-  link.click();
-}
+  async function saveResult() {
+    if (!resultRef.current) return;
+  
+    try {
+      const canvas = await html2canvas(resultRef.current, {
+        backgroundColor: "#ffffff",
+        scale: 2,
+        useCORS: true,
+      });
+  
+      const image = canvas.toDataURL("image/png");
+  
+      const link = document.createElement("a");
+      link.href = image;
+      link.download = "心理測驗結果.png";
+  
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (error) {
+      console.log("保存失敗：", error);
+      alert("保存失敗，請看 Console 錯誤訊息");
+    }
+  }
 
   useEffect( ()=>{
     getResult();
